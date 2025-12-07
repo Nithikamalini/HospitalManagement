@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --white: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px 30px;
+            background: var(--white);
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .tab-content {
+            display: none;
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-success {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: var(--white);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: var(--primary);
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: var(--light);
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid var(--danger);
+        }
+
+        .card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-card h4 {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Hospital Management System</h1>
+            <p>Complete Healthcare Management Solution</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('dashboard')">📊 Dashboard</button>
+            <button class="tab-btn" onclick="showTab('patients')">👥 Patients</button>
+            <button class="tab-btn" onclick="showTab('doctors')">👨‍⚕️ Doctors</button>
+            <button class="tab-btn" onclick="showTab('appointments')">📅 Appointments</button>
+            <button class="tab-btn" onclick="showTab('billing')">💰 Billing</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <h2 style="margin-bottom: 20px; color: var(--dark);">Dashboard Overview</h2>
+            <div class="stats">
+                <div class="stat-card">
+                    <h4>Total Patients</h4>
+                    <div class="number" id="totalPatients">0</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    <h4>Total Doctors</h4>
+                    <div class="number" id="totalDoctors">0</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                    <h4>Total Appointments</h4>
+                    <div class="number" id="totalAppointments">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patients Tab -->
+        <div id="patients" class="tab-content">
+            <h2 style="margin-bottom: 20px; color: var(--dark);">Patient Management</h2>
+            
+            <div id="patientAlert"></div>
+            
+            <div class="card">
+                <h3>Add New Patient</h3>
+                <form id="patientForm" onsubmit="addPatient(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Name *</label>
+                            <input type="text" id="patientName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Age *</label>
+                            <input type="number" id="patientAge" min="1" max="150" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Gender *</label>
+                            <select id="patientGender" required>
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone *</label>
+                            <input type="tel" id="patientPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Address *</label>
+                            <input type="text" id="patientAddress" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Disease *</label>
+                            <input type="text" id="patientDisease" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Patient</button>
+                    <button type="button" class="btn btn-warning" onclick="loadPatients()">Refresh List</button>
+                </form>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient ID</th>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>Phone</th>
+                            <th>Disease</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patientsTable">
+                        <tr><td colspan="7" class="loading">Loading patients...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Doctors Tab -->
+        <div id="doctors" class="tab-content">
+            <h2 style="margin-bottom: 20px; color: var(--dark);">Doctor Management</h2>
+            
+            <div id="doctorAlert"></div>
+            
+            <div class="card">
+                <h3>Add New Doctor</h3>
+                <form id="doctorForm" onsubmit="addDoctor(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Name *</label>
+                            <input type="text" id="doctorName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Specialization *</label>
+                            <input type="text" id="doctorSpecialization" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone *</label>
+                            <input type="tel" id="doctorPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Experience (years) *</label>
+                            <input type="number" id="doctorExperience" min="0" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Doctor</button>
+                    <button type="button" class="btn btn-warning" onclick="loadDoctors()">Refresh List</button>
+                </form>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Doctor ID</th>
+                            <th>Name</th>
+                            <th>Specialization</th>
+                            <th>Phone</th>
+                            <th>Experience</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="doctorsTable">
+                        <tr><td colspan="6" class="loading">Loading doctors...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Appointments Tab -->
+        <div id="appointments" class="tab-content">
+            <h2 style="margin-bottom: 20px; color: var(--dark);">Appointment Management</h2>
+            
+            <div id="appointmentAlert"></div>
+            
+            <div class="card">
+                <h3>Book New Appointment</h3>
+                <form id="appointmentForm" onsubmit="bookAppointment(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Patient *</label>
+                            <select id="appointmentPatient" required>
+                                <option value="">Select Patient</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Doctor *</label>
+                            <select id="appointmentDoctor" required>
+                                <option value="">Select Doctor</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Date *</label>
+                            <input type="date" id="appointmentDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Time *</label>
+                            <input type="time" id="appointmentTime" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Book Appointment</button>
+                    <button type="button" class="btn btn-warning" onclick="loadAppointments()">Refresh List</button>
+                </form>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Appointment ID</th>
+                            <th>Patient ID</th>
+                            <th>Doctor ID</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointmentsTable">
+                        <tr><td colspan="5" class="loading">Loading appointments...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Billing Tab -->
+        <div id="billing" class="tab-content">
+            <h2 style="margin-bottom: 20px; color: var(--dark);">Billing Management</h2>
+            
+            <div id="billingAlert"></div>
+            
+            <div class="card">
+                <h3>Create New Bill</h3>
+                <form id="billingForm" onsubmit="createBill(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Appointment *</label>
+                            <select id="billAppointment" required onchange="loadAppointmentDetails()">
+                                <option value="">Select Appointment</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Patient Name</label>
+                            <input type="text" id="billPatientName" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Doctor Name</label>
+                            <input type="text" id="billDoctorName" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Treatment Charges (₹) *</label>
+                            <input type="number" id="billTreatment" min="0" step="0.01" required oninput="calculateTotal()">
+                        </div>
+                        <div class="form-group">
+                            <label>Medicine Charges (₹) *</label>
+                            <input type="number" id="billMedicine" min="0" step="0.01" required oninput="calculateTotal()">
+                        </div>
+                        <div class="form-group">
+                            <label>Total Amount (₹)</label>
+                            <input type="number" id="billTotal" readonly>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Bill</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+        let patients = [];
+        let doctors = [];
+        let appointments = [];
+
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'dashboard') loadDashboard();
+            if (tabName === 'patients') loadPatients();
+            if (tabName === 'doctors') loadDoctors();
+            if (tabName === 'appointments') {
+                loadAppointments();
+                loadPatientsForDropdown();
+                loadDoctorsForDropdown();
+            }
+            if (tabName === 'billing') {
+                loadAppointmentsForDropdown();
+            }
+        }
+
+        // Dashboard
+        async function loadDashboard() {
+            try {
+                const [patientsRes, doctorsRes, appointmentsRes] = await Promise.all([
+                    fetch(`${API_BASE}/patients`),
+                    fetch(`${API_BASE}/doctors`),
+                    fetch(`${API_BASE}/appointments`)
+                ]);
+                
+                const patients = await patientsRes.json();
+                const doctors = await doctorsRes.json();
+                const appointments = await appointmentsRes.json();
+                
+                document.getElementById('totalPatients').textContent = patients.length;
+                document.getElementById('totalDoctors').textContent = doctors.length;
+                document.getElementById('totalAppointments').textContent = appointments.length;
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        // Patients
+        async function loadPatients() {
+            try {
+                const response = await fetch(`${API_BASE}/patients`);
+                patients = await response.json();
+                
+                const tbody = document.getElementById('patientsTable');
+                if (patients.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="loading">No patients found</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = patients.map(p => `
+                    <tr>
+                        <td>${p.patientId.substring(0, 8)}...</td>
+                        <td>${p.name}</td>
+                        <td>${p.age}</td>
+                        <td>${p.gender}</td>
+                        <td>${p.phone}</td>
+                        <td>${p.disease}</td>
+                        <td class="actions">
+                            <button class="btn btn-danger" onclick="deletePatient('${p.patientId}')">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                showAlert('patientAlert', 'Error loading patients: ' + error.message, 'error');
+            }
+        }
+
+        async function addPatient(e) {
+            e.preventDefault();
+            
+            const patient = {
+                name: document.getElementById('patientName').value,
+                age: parseInt(document.getElementById('patientAge').value),
+                gender: document.getElementById('patientGender').value,
+                phone: document.getElementById('patientPhone').value,
+                address: document.getElementById('patientAddress').value,
+                disease: document.getElementById('patientDisease').value
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/patients`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(patient)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showAlert('patientAlert', 'Patient added successfully! ID: ' + result.patientId, 'success');
+                    document.getElementById('patientForm').reset();
+                    loadPatients();
+                }
+            } catch (error) {
+                showAlert('patientAlert', 'Error adding patient: ' + error.message, 'error');
+            }
+        }
+
+        async function deletePatient(id) {
+            if (!confirm('Are you sure you want to delete this patient?')) return;
+            
+            try {
+                await fetch(`${API_BASE}/patient?id=${id}`, { method: 'DELETE' });
+                showAlert('patientAlert', 'Patient deleted successfully!', 'success');
+                loadPatients();
+            } catch (error) {
+                showAlert('patientAlert', 'Error deleting patient: ' + error.message, 'error');
+            }
+        }
+
+        // Doctors
+        async function loadDoctors() {
+            try {
+                const response = await fetch(`${API_BASE}/doctors`);
+                doctors = await response.json();
+                
+                const tbody = document.getElementById('doctorsTable');
+                if (doctors.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="loading">No doctors found</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = doctors.map(d => `
+                    <tr>
+                        <td>${d.doctorId.substring(0, 8)}...</td>
+                        <td>${d.name}</td>
+                        <td>${d.specialization}</td>
+                        <td>${d.phone}</td>
+                        <td>${d.experience} years</td>
+                        <td class="actions">
+                            <button class="btn btn-danger" onclick="deleteDoctor('${d.doctorId}')">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                showAlert('doctorAlert', 'Error loading doctors: ' + error.message, 'error');
+            }
+        }
+
+        async function addDoctor(e) {
+            e.preventDefault();
+            
+            const doctor = {
+                name: document.getElementById('doctorName').value,
+                specialization: document.getElementById('doctorSpecialization').value,
+                phone: document.getElementById('doctorPhone').value,
+                experience: parseInt(document.getElementById('doctorExperience').value)
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/doctors`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(doctor)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showAlert('doctorAlert', 'Doctor added successfully! ID: ' + result.doctorId, 'success');
+                    document.getElementById('doctorForm').reset();
+                    loadDoctors();
+                }
+            } catch (error) {
+                showAlert('doctorAlert', 'Error adding doctor: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteDoctor(id) {
+            if (!confirm('Are you sure you want to delete this doctor?')) return;
+            
+            try {
+                await fetch(`${API_BASE}/doctor?id=${id}`, { method: 'DELETE' });
+                showAlert('doctorAlert', 'Doctor deleted successfully!', 'success');
+                loadDoctors();
+            } catch (error) {
+                showAlert('doctorAlert', 'Error deleting doctor: ' + error.message, 'error');
+            }
+        }
+
+        // Appointments
+        async function loadPatientsForDropdown() {
+            const response = await fetch(`${API_BASE}/patients`);
+            patients = await response.json();
+            
+            const select = document.getElementById('appointmentPatient');
+            select.innerHTML = '<option value="">Select Patient</option>' + 
+                patients.map(p => `<option value="${p.patientId}">${p.name} (${p.patientId.substring(0, 8)}...)</option>`).join('');
+        }
+
+        async function loadDoctorsForDropdown() {
+            const response = await fetch(`${API_BASE}/doctors`);
+            doctors = await response.json();
+            
+            const select = document.getElementById('appointmentDoctor');
+            select.innerHTML = '<option value="">Select Doctor</option>' + 
+                doctors.map(d => `<option value="${d.doctorId}">${d.name} - ${d.specialization}</option>`).join('');
+        }
+
+        async function loadAppointments() {
+            try {
+                const response = await fetch(`${API_BASE}/appointments`);
+                appointments = await response.json();
+                
+                const tbody = document.getElementById('appointmentsTable');
+                if (appointments.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="loading">No appointments found</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = appointments.map(a => `
+                    <tr>
+                        <td>${a.appointmentId.substring(0, 8)}...</td>
+                        <td>${a.patientId.substring(0, 8)}...</td>
+                        <td>${a.doctorId.substring(0, 8)}...</td>
+                        <td>${a.date}</td>
+                        <td>${a.time}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                showAlert('appointmentAlert', 'Error loading appointments: ' + error.message, 'error');
+            }
+        }
+
+        async function bookAppointment(e) {
+            e.preventDefault();
+            
+            const appointment = {
+                patientId: document.getElementById('appointmentPatient').value,
+                doctorId: document.getElementById('appointmentDoctor').value,
+                date: document.getElementById('appointmentDate').value,
+                time: document.getElementById('appointmentTime').value
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/appointments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(appointment)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showAlert('appointmentAlert', 'Appointment booked successfully! ID: ' + result.appointmentId, 'success');
+                    document.getElementById('appointmentForm').reset();
+                    loadAppointments();
+                }
+            } catch (error) {
+                showAlert('appointmentAlert', 'Error booking appointment: ' + error.message, 'error');
+            }
+        }
+
+        // Billing
+        async function loadAppointmentsForDropdown() {
+            const response = await fetch(`${API_BASE}/appointments`);
+            appointments = await response.json();
+            
+            const select = document.getElementById('billAppointment');
+            select.innerHTML = '<option value="">Select Appointment</option>' + 
+                appointments.map(a => `<option value="${a.appointmentId}">${a.appointmentId.substring(0, 8)}... - ${a.date} ${a.time}</option>`).join('');
+        }
+
+        async function loadAppointmentDetails() {
+            const appointmentId = document.getElementById('billAppointment').value;
+            if (!appointmentId) return;
+            
+            const appointment = appointments.find(a => a.appointmentId === appointmentId);
+            if (!appointment) return;
+            
+            const patient = patients.find(p => p.patientId === appointment.patientId) || 
+                           await fetch(`${API_BASE}/patient?id=${appointment.patientId}`).then(r => r.json());
+            const doctor = doctors.find(d => d.doctorId === appointment.doctorId) || 
+                          await fetch(`${API_BASE}/doctor?id=${appointment.doctorId}`).then(r => r.json());
+            
+            document.getElementById('billPatientName').value = patient?.name || 'Unknown';
+            document.getElementById('billDoctorName').value = doctor?.name || 'Unknown';
+        }
+
+        function calculateTotal() {
+            const treatment = parseFloat(document.getElementById('billTreatment').value) || 0;
+            const medicine = parseFloat(document.getElementById('billMedicine').value) || 0;
+            document.getElementById('billTotal').value = (treatment + medicine).toFixed(2);
+        }
+
+        async function createBill(e) {
+            e.preventDefault();
+            
+            const bill = {
+                appointmentId: document.getElementById('billAppointment').value,
+                patientName: document.getElementById('billPatientName').value,
+                doctorName: document.getElementById('billDoctorName').value,
+                treatmentCharges: parseFloat(document.getElementById('billTreatment').value),
+                medicineCharges: parseFloat(document.getElementById('billMedicine').value),
+                totalAmount: parseFloat(document.getElementById('billTotal').value)
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/bills`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bill)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    showAlert('billingAlert', 'Bill created successfully! ID: ' + result.billId + ' | Total: ₹' + bill.totalAmount, 'success');
+                    document.getElementById('billingForm').reset();
+                }
+            } catch (error) {
+                showAlert('billingAlert', 'Error creating bill: ' + error.message, 'error');
+            }
+        }
+
+        // Utility functions
+        function showAlert(elementId, message, type) {
+            const alertDiv = document.getElementById(elementId);
+            alertDiv.innerHTML = `<div class="alert alert-${type === 'error' ? 'error' : 'success'}">${message}</div>`;
+            setTimeout(() => alertDiv.innerHTML = '', 5000);
+        }
+
+        // Initialize
+        window.onload = () => {
+            loadDashboard();
+            loadPatients();
+        };
+    </script>
+</body>
+</html>
